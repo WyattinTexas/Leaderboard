@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOO! Leaderboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f, #ff006e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #a8a8a8;
+            letter-spacing: 0.05em;
+        }
+
+        .top-five-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.05em;
+        }
+
+        .top-five {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .elite-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 35px;
+            align-items: center;
+            transition: all 0.4s ease;
+            animation: fadeInUp 0.6s ease backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .elite-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .elite-card:hover::before {
+            left: 100%;
+        }
+
+        .elite-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 60px rgba(255, 107, 107, 0.3);
+        }
+
+        .elite-card:nth-child(1) {
+            animation-delay: 0.1s;
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .elite-card:nth-child(2) {
+            animation-delay: 0.2s;
+            border-color: rgba(192, 192, 192, 0.4);
+            box-shadow: 0 10px 40px rgba(192, 192, 192, 0.15);
+        }
+
+        .elite-card:nth-child(3) {
+            animation-delay: 0.3s;
+            border-color: rgba(205, 127, 50, 0.4);
+            box-shadow: 0 10px 40px rgba(205, 127, 50, 0.15);
+        }
+
+        .elite-card:nth-child(4) {
+            animation-delay: 0.4s;
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        .elite-card:nth-child(5) {
+            animation-delay: 0.5s;
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        .elite-rank {
+            font-size: 3.5rem;
+            font-weight: 900;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+            position: relative;
+        }
+
+        .elite-card:nth-child(1) .elite-rank {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
+            animation: pulse-gold 2s ease-in-out infinite;
+        }
+
+        .elite-card:nth-child(2) .elite-rank {
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            color: #1a1a2e;
+            box-shadow: 0 10px 30px rgba(192, 192, 192, 0.5);
+        }
+
+        .elite-card:nth-child(3) .elite-rank {
+            background: linear-gradient(135deg, #cd7f32, #e8a05c);
+            color: #1a1a2e;
+            box-shadow: 0 10px 30px rgba(205, 127, 50, 0.5);
+        }
+
+        .elite-player-info {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .elite-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.4s ease;
+        }
+
+        .elite-card:hover .elite-photo {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .elite-card:nth-child(1) .elite-photo {
+            border-color: rgba(255, 215, 0, 0.6);
+        }
+
+        .elite-card:nth-child(2) .elite-photo {
+            border-color: rgba(192, 192, 192, 0.6);
+        }
+
+        .elite-card:nth-child(3) .elite-photo {
+            border-color: rgba(205, 127, 50, 0.6);
+        }
+
+        .elite-details h2 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .elite-details .hometown {
+            color: #b8b8b8;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .elite-details .hometown::before {
+            content: '📍';
+        }
+
+        .elite-cards {
+            display: flex;
+            gap: 18px;
+        }
+
+        .elite-card-img {
+            width: 90px;
+            height: 125px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .elite-card-img:hover {
+            transform: translateY(-15px) scale(1.1);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.5);
+            border-color: rgba(255, 107, 107, 0.7);
+        }
+
+        .score-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 107, 107, 0.2);
+            border: 2px solid rgba(255, 107, 107, 0.4);
+            border-radius: 15px;
+            padding: 20px 25px;
+            min-width: 120px;
+        }
+
+        .elite-card:nth-child(1) .score-badge {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .elite-card:nth-child(2) .score-badge {
+            background: rgba(192, 192, 192, 0.2);
+            border-color: rgba(192, 192, 192, 0.5);
+        }
+
+        .elite-card:nth-child(3) .score-badge {
+            background: rgba(205, 127, 50, 0.2);
+            border-color: rgba(205, 127, 50, 0.5);
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #a8a8a8;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .remaining-section {
+            margin-top: 60px;
+        }
+
+        .remaining-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #c8c8c8;
+            letter-spacing: 0.05em;
+        }
+
+        .remaining-players {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .standard-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 60px auto 1fr auto auto;
+            gap: 25px;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease backwards;
+        }
+
+        .standard-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 107, 107, 0.3);
+            transform: translateX(10px);
+        }
+
+        .standard-rank {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #a8a8a8;
+            text-align: center;
+        }
+
+        .standard-photo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .standard-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .standard-info h3 {
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        .standard-info .hometown {
+            color: #888;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .standard-info .hometown::before {
+            content: '📍';
+        }
+
+        .standard-cards {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .standard-card-img {
+            width: 60px;
+            height: 85px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .standard-card-img:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 107, 107, 0.4);
+        }
+
+        .standard-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .standard-score-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #777;
+            margin-bottom: 3px;
+        }
+
+        .standard-score-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ff6b6b;
+        }
+
+        @keyframes pulse-gold {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
+            }
+            50% {
+                box-shadow: 0 10px 50px rgba(255, 215, 0, 0.9);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .elite-card {
+                grid-template-columns: auto 1fr;
+                gap: 25px;
+            }
+
+            .elite-cards,
+            .score-badge {
+                grid-column: 1 / -1;
+                justify-self: center;
+            }
+
+            .standard-card {
+                grid-template-columns: auto auto 1fr;
+                gap: 15px;
+            }
+
+            .standard-cards,
+            .standard-score {
+                grid-column: 1 / -1;
+                justify-self: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .elite-card {
+                padding: 25px;
+            }
+
+            .elite-photo {
+                width: 90px;
+                height: 90px;
+            }
+
+            .elite-rank {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+
+            .elite-details h2 {
+                font-size: 1.6rem;
+            }
+
+            .elite-card-img {
+                width: 70px;
+                height: 95px;
+            }
+
+            .standard-photo {
+                width: 60px;
+                height: 60px;
+            }
+
+            .standard-card-img {
+                width: 50px;
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>BOO!</h1>
+            <p>LEADERBOARD</p>
+        </div>
+
+        <div class="top-five-section">
+            <h2 class="section-title">⭐ ELITE TOP 5 ⭐</h2>
+            <div class="top-five">
+                
+                <div class="elite-card">
+                    <div class="elite-rank">1</div>
+                    <div class="elite-player-info">
+                        <img src="./images/image_0001.png" alt="Wyatt Gable" class="elite-photo">
+                        <div class="elite-details">
+                            <h2>Wyatt Gable</h2>
+                            <div class="hometown">Estero, FL</div>
+                        </div>
+                    </div>
+                    <div class="elite-cards">
+                        <img src="./images/image_0002.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0003.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0004.png" class="elite-card-img" alt="Card">
+                    </div>
+                    <div class="score-badge">
+                        <div class="score-label">Points</div>
+                        <div class="score-value">300</div>
+                    </div>
+                </div>
+
+                
+                <div class="elite-card">
+                    <div class="elite-rank">2</div>
+                    <div class="elite-player-info">
+                        <img src="./images/image_0005.png" alt="Zachary Diaz" class="elite-photo">
+                        <div class="elite-details">
+                            <h2>Zachary Diaz</h2>
+                            <div class="hometown">Estero, FL</div>
+                        </div>
+                    </div>
+                    <div class="elite-cards">
+                        <img src="./images/image_0006.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0007.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0008.png" class="elite-card-img" alt="Card">
+                    </div>
+                    <div class="score-badge">
+                        <div class="score-label">Points</div>
+                        <div class="score-value">250</div>
+                    </div>
+                </div>
+
+                
+                <div class="elite-card">
+                    <div class="elite-rank">3</div>
+                    <div class="elite-player-info">
+                        <img src="./images/image_0009.png" alt="Laura Hardin" class="elite-photo">
+                        <div class="elite-details">
+                            <h2>Laura Hardin</h2>
+                            <div class="hometown">Bonita Springs, FL</div>
+                        </div>
+                    </div>
+                    <div class="elite-cards">
+                        <img src="./images/image_0010.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0011.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0012.png" class="elite-card-img" alt="Card">
+                    </div>
+                    <div class="score-badge">
+                        <div class="score-label">Points</div>
+                        <div class="score-value">200</div>
+                    </div>
+                </div>
+
+                
+                <div class="elite-card">
+                    <div class="elite-rank">4</div>
+                    <div class="elite-player-info">
+                        <img src="./images/image_0013.png" alt="Kem Louissaint" class="elite-photo">
+                        <div class="elite-details">
+                            <h2>Kem Louissaint</h2>
+                            <div class="hometown">Ft Myers, FL</div>
+                        </div>
+                    </div>
+                    <div class="elite-cards">
+                        <img src="./images/image_0014.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0015.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0016.png" class="elite-card-img" alt="Card">
+                    </div>
+                    <div class="score-badge">
+                        <div class="score-label">Points</div>
+                        <div class="score-value">175</div>
+                    </div>
+                </div>
+
+                
+                <div class="elite-card">
+                    <div class="elite-rank">5</div>
+                    <div class="elite-player-info">
+                        <img src="./images/image_0017.png" alt="Chris Powers" class="elite-photo">
+                        <div class="elite-details">
+                            <h2>Chris Powers</h2>
+                            <div class="hometown">Jacksonville, FL</div>
+                        </div>
+                    </div>
+                    <div class="elite-cards">
+                        <img src="./images/image_0018.png" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0019.jpeg" class="elite-card-img" alt="Card">
+                        <img src="./images/image_0020.png" class="elite-card-img" alt="Card">
+                    </div>
+                    <div class="score-badge">
+                        <div class="score-label">Points</div>
+                        <div class="score-value">100</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="remaining-section">
+            <h2 class="remaining-title">Rankings 6-25</h2>
+            <div class="remaining-players">
+                
+                <div class="standard-card">
+                    <div class="standard-rank">6</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Steven Myers" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Steven Myers</h3>
+                        <div class="hometown">Olive Branch, MI</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0021.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0022.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0023.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">100</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">7</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Skylar Winter" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Skylar Winter</h3>
+                        <div class="hometown">Nyack, NY</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0024.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0025.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0026.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">100</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">8</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Cassie Williams" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Cassie Williams</h3>
+                        <div class="hometown">Portland, ME</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0027.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0028.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0029.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">75</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">9</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Lou Cortez" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Lou Cortez</h3>
+                        <div class="hometown">Cape Coral, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0030.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0031.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0032.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">75</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">10</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Joshua Bonvino" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Joshua Bonvino</h3>
+                        <div class="hometown">Temecula, CA</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0033.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0034.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0035.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">50</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">11</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Charolette Burger" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Charolette Burger</h3>
+                        <div class="hometown">Newyork, NY</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0036.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0037.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0038.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">50</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">12</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Adam Campersal" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Adam Campersal</h3>
+                        <div class="hometown">Medfield, MA</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0039.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0040.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0041.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">50</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">13</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="William Moore" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>William Moore</h3>
+                        <div class="hometown">Stoneham, MA</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0042.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0043.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0044.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">50</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">14</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Al Hall" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Al Hall</h3>
+                        <div class="hometown">Long Island, NY</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0045.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0046.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0047.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">50</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">15</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Maisie Diaz" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Maisie Diaz</h3>
+                        <div class="hometown">Estero, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0048.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0049.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0050.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">25</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">16</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Rick Hardin" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Rick Hardin</h3>
+                        <div class="hometown">Bonita Springs, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0051.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0052.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0053.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">17</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Victoria Gable" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Victoria Gable</h3>
+                        <div class="hometown">Estero, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0054.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0055.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0056.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">18</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Peggy Cappie" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Peggy Cappie</h3>
+                        <div class="hometown">Miami, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0057.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0058.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0059.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">19</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Rafael Vivas" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Rafael Vivas</h3>
+                        <div class="hometown">Miami, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0060.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0061.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0062.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">20</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Mable Stadango " class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Mable Stadango </h3>
+                        <div class="hometown">Newyork, NY</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0063.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0064.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0065.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">21</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Eddie Vivas" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Eddie Vivas</h3>
+                        <div class="hometown">Miami, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0066.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0067.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0068.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">22</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Purple Jesus" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Purple Jesus</h3>
+                        <div class="hometown">Orlando, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0069.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0070.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0071.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">23</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Dayna Vucksinick" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Dayna Vucksinick</h3>
+                        <div class="hometown">Cleveland, OH</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0072.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0073.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0074.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">24</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Coleman Moore" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Coleman Moore</h3>
+                        <div class="hometown">Durham, NH</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0075.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0076.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0077.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+
+                
+                <div class="standard-card">
+                    <div class="standard-rank">25</div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect fill="%23333" width="120" height="120"/%3E%3Ctext fill="%23fff" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E" alt="Sam Diaz" class="standard-photo">
+                    <div class="standard-info">
+                        <h3>Sam Diaz</h3>
+                        <div class="hometown">Estero, FL</div>
+                    </div>
+                    <div class="standard-cards">
+                        <img src="./images/image_0078.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0079.png" class="standard-card-img" alt="Card">
+                        <img src="./images/image_0080.png" class="standard-card-img" alt="Card">
+                    </div>
+                    <div class="standard-score">
+                        <div class="standard-score-label">Points</div>
+                        <div class="standard-score-value">10</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
